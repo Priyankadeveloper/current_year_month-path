@@ -1,0 +1,87 @@
+else if(isset($_REQUEST['action']) && $_REQUEST['action'] == 'avatarinsert'){
+  
+
+$Getuserbyid=$db->Getuserbyid($_SESSION['user_id']);
+$userinfo=mysqli_fetch_array($Getuserbyid);
+
+
+   unlink('../img/profile_img/'.$userinfo['profile_path'].'/'.$userinfo['profile_img']);   
+
+ $imgFile = $_FILES['profile_img']['name'];
+              $tmp_dir = $_FILES['profile_img']['tmp_name'];
+              $imgSize = $_FILES['profile_img']['size'];
+              
+              $imgExt = strtolower(pathinfo($imgFile,PATHINFO_EXTENSION));   
+              $valid_extensions = array('jpeg', 'jpg','bmp', 'png', 'gif','svg'); 
+              $userpic = rand(1000,1000000).".".$imgExt;
+  
+  
+ $year = date("Y");   
+$month = date("m");   
+$filename = "../img/profile_img/".$year;   
+$filename2 = "../img/profile_img/".$year."/".$month;
+
+if(file_exists($filename)){
+    if(file_exists($filename2)){
+        
+    }
+else{
+mkdir($filename2,0755);
+}   
+}else{
+    mkdir($filename,0755);
+}    
+  
+$profile_path=   $year."/".$month;
+  
+     
+     $upload_dir = $filename2.'/'.$userpic;
+  
+  //$upload_dir = $filename2.'/'.$userpic; 
+               if(in_array($imgExt, $valid_extensions))
+              {  
+  
+  list($width, $height) = getimagesize($_FILES["profile_img"]["tmp_name"]);
+  
+  if($imgExt == 'png')
+   {
+    $new_image = imagecreatefrompng($_FILES["profile_img"]["tmp_name"]);
+   }
+   if($imgExt == 'jpg' || $ext == 'jpeg')  
+            {  
+               $new_image = imagecreatefromjpeg($_FILES["profile_img"]["tmp_name"]);  
+            }
+if($imgExt == 'gif')  
+            {  
+               $new_image = imagecreatefromgif($_FILES["profile_img"]["tmp_name"]);  
+            }
+ if($imgExt == 'bmp')  
+            {  
+               $new_image = imagecreatefromstring($_FILES["profile_img"]["tmp_name"]);  
+            } 
+  
+  $new_width=150;
+            $new_height =150;
+$tmp_image = imagecreatetruecolor($new_width, $new_height);
+            imagecopyresampled($tmp_image, $new_image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+               // if($imgSize < 1000000)
+                  // { 
+                
+        imagejpeg($tmp_image, $upload_dir,100);
+
+
+//move_uploaded_file($tmp_image,$upload_dir.$userpic);
+                   $update="update `signup` set `profile_img`='".$userpic."',`profile_path`='".$profile_path."' where `id`='".$_SESSION['user_id']."'";
+ $run=$db->query($update);
+ if($run){   
+      echo 1;  
+ }else{
+  echo 0;   
+ }
+                  // }           
+              }      
+
+  
+
+
+}											
